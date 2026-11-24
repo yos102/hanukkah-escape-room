@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>חדר הבריחה של חנוכה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Suez+One&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a night window lit by a hanukkiah. The menorah and the safe's code dials are the one bold element; challenge cards are calm, high-contrast paper for projection. Single theme by choice. */
+:root{
+  --night:#0d1236;
+  --night-2:#182061;
+  --flame:#ffb52e;
+  --flame-deep:#ff7b1c;
+  --paper:#f1f4ff;
+  --text:#f1f4ff;
+  --ink:#141a45;
+  --mist:#a9bbff;
+  --line:rgba(169,187,255,.22);
+  --good:#1f9e6c;
+  --bad:#d93a4e;
+  --font-display:"Suez One","Frank Ruhl Libre","David",serif;
+  --font-body:"Fredoka","Varela Round","Arial Hebrew",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{height:100%;margin:0}
+body{
+  background:var(--night);
+  background-image:radial-gradient(ellipse 90% 60% at 50% 0%, #1e2873 0%, var(--night) 60%, #070a24 100%);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:clamp(16px, .55vw + 12px, 22px);
+  line-height:1.5;
+}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--flame);outline-offset:3px}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#confetti{position:fixed;inset:0;width:100%;height:100%;z-index:50;pointer-events:none}
+.app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
+
+/* top bar */
+.topbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:6px clamp(16px,2vw,32px)}
+.brand{background:none;border:0;padding:4px 0;font-family:var(--font-display);font-size:clamp(18px,1.4vw,26px);color:var(--flame);letter-spacing:.01em}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.ghost{background:transparent;color:var(--mist);border:1.5px solid var(--line);border-radius:999px;padding:.4em 1em;font-size:clamp(14px,.7vw + 8px,18px);font-weight:500;min-height:40px}
+.ghost:hover{color:var(--text);border-color:var(--mist)}
+
+main{flex:1;overflow:auto;padding:0 clamp(16px,2vw,32px) 10px}
+
+/* shared pieces */
+.kicker{margin:0;color:var(--mist);font-weight:500;letter-spacing:.04em;font-size:clamp(15px,1vw + 8px,24px)}
+.title{
+  margin:.1em 0 .15em;font-family:var(--font-display);font-weight:400;line-height:.98;
+  font-size:clamp(46px,6.6vw,112px);text-wrap:balance;
+  background:linear-gradient(180deg,#fff4c8 0%,#ffc54a 55%,#e8780f 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 28px rgba(255,170,40,.35));
+}
+.cta{
+  font-family:var(--font-body);font-weight:700;font-size:clamp(18px,1.1vw + 10px,28px);
+  color:#2a1600;background:linear-gradient(180deg,#ffd862,#ffa41b);border:0;border-radius:999px;
+  padding:.6em 1.6em;min-height:52px;box-shadow:0 6px 0 #b8640c,0 14px 34px rgba(255,170,40,.32);
+  transition:transform .08s, box-shadow .08s;
+}
+.cta:active{transform:translateY(4px);box-shadow:0 2px 0 #b8640c,0 8px 20px rgba(255,170,40,.3)}
+.cta:disabled{filter:grayscale(.7);opacity:.5;cursor:not-allowed}
+
+/* menorah */
+.menorah-slot{width:100%}
+.menorah{display:block;width:100%;height:auto;overflow:visible}
+.menorah .wax{transition:opacity .4s}
+.menorah .candle:not(.lit) .wax{opacity:.55}
+.menorah .ignite{transform:scale(0);opacity:0;transform-box:fill-box;transform-origin:50% 100%;transition:transform .7s cubic-bezier(.2,1.7,.4,1),opacity .25s}
+.menorah .lit .ignite{transform:scale(1);opacity:1}
+.menorah .flicker{transform-box:fill-box;transform-origin:50% 100%;animation:flicker 1.7s ease-in-out infinite alternate}
+.menorah .halo{animation:pulse 2.4s ease-in-out infinite alternate}
+.menorah .cnum{fill:var(--mist);font:600 24px var(--font-body);text-anchor:middle;transition:fill .4s}
+.menorah .cnum.on{fill:var(--flame)}
+.menorah .aura{transition:opacity .8s}
+@keyframes flicker{
+  0%{transform:rotate(-2deg) scale(1,1)}
+  35%{transform:rotate(1.5deg) scale(.95,1.06)}
+  70%{transform:rotate(-1deg) scale(1.03,.96)}
+  100%{transform:rotate(2deg) scale(.98,1.04)}
+}
+@keyframes pulse{from{opacity:.7}to{opacity:1}}
+
+/* code dials */
+.code-slot{container-type:inline-size;width:100%}
+.code{display:flex;justify-content:center;gap:min(1.4cqi,10px);perspective:400px}
+.tumbler{
+  width:min(10.6cqi,66px);aspect-ratio:.78;border-radius:10px;display:grid;place-items:center;
+  background:linear-gradient(180deg,#060920 0%,#1b2466 48%,#060920 100%);
+  border:2px solid rgba(224,169,58,.55);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.65),0 0 0 3px rgba(6,9,32,.85);
+  font-family:var(--font-display);font-size:min(7.2cqi,46px);line-height:1;color:rgba(169,187,255,.3);
+}
+.tumbler.on{color:#ffd35e;text-shadow:0 0 14px rgba(255,180,40,.75);animation:roll .8s cubic-bezier(.2,1.4,.4,1)}
+.code.open .tumbler{animation:wave 1.4s ease-in-out both;animation-delay:calc(var(--d) * 90ms)}
+@keyframes roll{0%{transform:rotateX(95deg)}100%{transform:rotateX(0)}}
+@keyframes wave{0%,100%{transform:none}40%{transform:translateY(-14px) scale(1.08);box-shadow:inset 0 3px 10px rgba(0,0,0,.65),0 0 26px 4px rgba(255,180,40,.6)}}
+.code-label{color:var(--mist);font-weight:500;text-align:center;font-size:clamp(14px,.6vw + 9px,19px);margin-bottom:6px}
+
+/* home */
+#home{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:clamp(16px,2.4vw,34px);padding-top:4px}
+.hero{text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero .menorah-slot{max-width:min(620px,100%);margin-top:4px}
+.hero .code-slot{max-width:min(560px,100%);margin-top:4px}
+.home-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(14px,2vw,28px)}
+.panel{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:22px;padding:clamp(18px,2vw,30px)}
+.panel h2{margin:0 0 .4em;font-family:var(--font-display);font-weight:400;color:var(--flame);font-size:clamp(24px,1.8vw + 8px,38px)}
+.panel p{margin:0 0 .8em;max-width:62ch}
+.rules{margin:0;padding:0;list-style:none;display:grid;gap:.6em;counter-reset:r}
+.rules li{counter-increment:r;display:grid;grid-template-columns:2em 1fr;gap:.6em;align-items:start}
+.rules li::before{content:counter(r);display:grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;background:rgba(255,181,46,.16);color:var(--flame);font-weight:700}
+.setup label.lbl{display:block;color:var(--mist);font-weight:500;margin-bottom:.4em}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1em}
+.seg button{min-width:52px;min-height:46px;border-radius:14px;border:1.5px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-weight:600;font-size:1.1em}
+.seg button[aria-pressed="true"]{background:var(--flame);color:#2a1600;border-color:var(--flame)}
+.names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:1.2em}
+.name-field{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1.5px solid var(--line);border-radius:14px;padding:4px 10px;border-inline-start:6px solid var(--tc)}
+.name-field input{flex:1;min-width:0;background:transparent;border:0;color:var(--text);font:inherit;font-weight:500;padding:.45em 0}
+.name-field input:focus{outline:none}
+.name-field:focus-within{border-color:var(--flame);border-inline-start-color:var(--tc)}
+
+/* play */
+.play-grid{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(250px,1fr);gap:clamp(14px,1.6vw,26px);align-items:start}
+.card{
+  background:var(--paper);color:var(--ink);border-radius:24px;padding:clamp(14px,1.8vw,30px);
+  box-shadow:0 24px 70px rgba(0,0,0,.4);position:relative;
+}
+.card.enter{animation:cardIn .45s ease-out}
+@keyframes cardIn{from{opacity:.2;transform:translateY(14px)}to{opacity:1;transform:none}}
+.eyebrow{display:inline-flex;align-items:center;gap:.5em;font-weight:600;color:#4152b8;font-size:clamp(15px,.8vw + 9px,22px)}
+.eyebrow::before{content:"";width:.55em;height:.8em;border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;background:linear-gradient(0deg,#ff6a00,#ffc54a)}
+.c-title{margin:.15em 0 .45em;font-family:var(--font-display);font-weight:400;font-size:calc(clamp(28px,min(2.8vw,5.2vh),52px) * var(--fit,1));line-height:1.05;text-wrap:balance;color:var(--ink)}
+.c-body{font-size:calc(clamp(18px,min(1.5vw + 8px,3.4vh),34px) * var(--fit,1));line-height:1.45}
+.c-body p{margin:0 0 .55em;max-width:64ch}
+.c-body .ask{font-weight:600;color:#2335a8;border-inline-start:6px solid var(--flame);padding-inline-start:.6em}
+.c-body .note{font-size:.85em;color:#5a6290}
+.c-body b{color:#0d1a7a}
+
+.tile{display:inline-grid;place-items:center;width:1.75em;height:1.95em;border-radius:10px;background:#fff;border:2px solid #c6d0ff;box-shadow:0 3px 0 #c6d0ff;font-family:var(--font-display);font-size:1.15em;color:var(--ink);margin:0 3px 6px}
+.cipher{display:flex;flex-wrap:wrap;gap:.2em 1.4em;margin:.2em 0 .8em}
+.cipher .tile{background:var(--night-2);color:#ffd35e;border-color:#3a4598;box-shadow:0 3px 0 #0a0f33}
+.keytable{display:grid;grid-template-columns:repeat(auto-fill,minmax(4.6em,1fr));gap:6px;font-size:.92em;margin-bottom:.6em}
+.pair{display:flex;align-items:center;justify-content:center;gap:.35em;background:#fff;border:1.5px solid #d4dbff;border-radius:10px;padding:.2em .3em;font-weight:600}
+.pair i{font-style:normal;color:#8a93c4;font-size:.85em}
+.riddles{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.riddle{margin:0;background:#fff;border-radius:18px;padding:.8em 1em;border-inline-start:7px solid var(--flame);box-shadow:0 2px 0 #dfe4ff}
+.riddle figcaption{font-weight:600;color:#4152b8;font-size:.75em}
+.riddle p{margin:.2em 0 .3em;line-height:1.6}
+.riddle .who{font-weight:700;color:#2335a8;margin:0}
+.nights{display:grid;gap:6px;margin:.2em 0 .9em;font-size:.95em}
+.night{display:flex;align-items:flex-end;gap:4px;background:#fff;border-radius:12px;padding:.35em .7em;border:1.5px solid #dfe4ff;width:fit-content;min-width:12em}
+.night span.lb{width:4.4em;font-weight:600;color:#4152b8;align-self:center}
+.stick{position:relative;display:inline-block;width:.42em;height:1.25em;background:#7aa2ff;border-radius:3px;margin:0 2px}
+.stick::before{content:"";position:absolute;left:50%;top:-.62em;width:.42em;height:.55em;transform:translateX(-50%);border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;background:linear-gradient(0deg,#ff6a00,#ffd35e)}
+.stick.sham{background:#e0a93a;height:1.65em;margin-inline-start:.6em}
+.night .q{font-weight:700;color:#2335a8;align-self:center;padding-inline-start:.4em}
+.dots-row{color:#8a93c4;padding-inline-start:5.4em;line-height:1}
+.anagrams{display:grid;gap:.25em;margin-bottom:.6em}
+.arow{display:flex;align-items:center;gap:.6em;flex-wrap:wrap}
+.anum{display:grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--ink);color:#fff;font-weight:700;font-size:.8em;flex:none}
+.story{background:#fff;border-radius:18px;padding:.9em 1.1em;border:1.5px solid #dfe4ff;font-size:.9em;line-height:1.75}
+.story p{max-width:none}
+.story p:last-child{margin-bottom:0}
+.err s{text-decoration:none}
+.err ins{display:none}
+.revealed .err s{text-decoration:line-through 3px;text-decoration-color:var(--bad);color:var(--bad)}
+.revealed .err ins{display:inline;text-decoration:none;background:#d6f5e6;color:#0f6b46;border-radius:6px;padding:0 .25em;margin-inline-start:.3em;font-weight:600}
+.rules-box{display:flex;flex-wrap:wrap;gap:8px;margin:.1em 0 .8em;font-size:.92em}
+.rules-box span{display:flex;align-items:center;gap:.2em;background:#fff;border:1.5px solid #dfe4ff;border-radius:12px;padding:.15em .6em .15em .3em}
+.rules-box .tile{margin:0;width:1.6em;height:1.7em;font-size:1em}
+.clues{margin:0 0 .8em;padding-inline-start:1.3em;display:grid;gap:.3em}
+.clues li::marker{font-weight:700;color:var(--flame-deep)}
+.big{font-size:1.25em}
+
+.c-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:.7em}
+.card.revealed .c-actions,.card.revealed .hint-box,.card.revealed .c-title{display:none}
+.btn{font-weight:600;font-size:clamp(16px,.8vw + 9px,22px);padding:.5em 1.2em;border-radius:999px;border:2px solid transparent;min-height:46px}
+.btn:disabled{opacity:.4;cursor:default}
+.hint-btn{background:#fff;color:var(--ink);border-color:#c6d0ff}
+.hint-btn:hover:not(:disabled){border-color:var(--ink)}
+.ans-btn{background:var(--ink);color:#fff}
+.ans-btn:hover:not(:disabled){background:#26308a}
+.hint-box{margin-top:1em;background:#fff6dc;border:2px dashed #e0a93a;border-radius:16px;padding:.7em 1em;font-size:calc(clamp(17px,min(1vw + 8px,3vh),26px) * var(--fit,1));color:#4a3500}
+.hint-box b{color:#8a5a00}
+.ans-box{margin-top:.6em;background:var(--night-2);color:var(--paper);border-radius:20px;padding:.7em 1em;display:grid;gap:.3em}
+.ans-label{color:#a9bbff;font-weight:600;font-size:clamp(14px,.7vw + 8px,19px)}
+.ans-main{font-family:var(--font-display);font-size:clamp(26px,min(2.3vw,4.4vh),44px);line-height:1.1;color:#ffd35e}
+.ans-explain{font-size:calc(clamp(16px,min(.9vw + 7px,2.9vh),24px) * (.6 + .4 * var(--fit,1)));color:#dfe5ff;max-width:72ch}
+.ans-explain ul{margin:.2em 0;padding-inline-start:1.2em;display:grid;gap:.2em}
+.ans-explain s{color:#ff8b98;text-decoration-thickness:2px}
+.ans-explain strong{color:#fff}
+.kids{display:flex;flex-wrap:wrap;gap:8px}
+.kids span{background:rgba(255,255,255,.08);border-radius:10px;padding:.1em .6em}
+.light-btn{justify-self:start;margin-top:.3em}
+.lit-note{display:flex;align-items:center;gap:.6em;flex-wrap:wrap;font-weight:600;color:#ffe7a6;font-size:clamp(17px,1vw + 8px,26px)}
+.lit-note .tumbler{width:1.8em;font-size:1.3em;animation:none;color:#ffd35e;text-shadow:0 0 12px rgba(255,180,40,.7)}
+.c-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:.9em;padding-top:.7em;border-top:1.5px solid #dfe4ff}
+.nav-btn{background:transparent;color:var(--ink);border:2px solid #c6d0ff}
+.nav-btn.next{background:var(--ink);color:#fff;border-color:var(--ink)}
+.nav-btn.vault{background:linear-gradient(180deg,#ffd862,#ffa41b);color:#2a1600;border-color:#e08a10}
+.nav-note{font-size:.9em;color:#5a6290;flex-basis:100%;text-align:start}
+
+.side{display:flex;flex-direction:column;gap:8px}
+.side .menorah-slot{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:22px;padding:10px 12px 4px}
+.side .menorah{max-height:24vh}
+.side-box{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:20px;padding:10px}
+.timer{display:grid;gap:10px}
+.t-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.t-label{color:var(--mist);font-weight:500;font-size:clamp(14px,.6vw + 9px,19px)}
+.t-time{font-weight:700;font-size:clamp(34px,3vw,60px);line-height:1;font-variant-numeric:tabular-nums;direction:ltr}
+.timer.up .t-time{color:#ff6b7c;animation:blink .8s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+.t-bar{height:10px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.t-bar i{display:block;height:100%;width:100%;background:linear-gradient(270deg,var(--flame-deep),var(--flame));border-radius:99px;transition:width .25s linear}
+.t-btns{display:flex;gap:8px;flex-wrap:wrap}
+.t-btns button{flex:1 1 auto;min-height:42px;border-radius:999px;border:1.5px solid var(--line);background:rgba(255,255,255,.07);color:var(--text);font-weight:600;font-size:clamp(15px,.6vw + 10px,19px);padding:.3em .9em}
+.t-btns button.go{background:var(--flame);color:#2a1600;border-color:var(--flame)}
+.dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.dot{width:clamp(30px,2.7vw,40px);height:clamp(30px,2.7vw,40px);border-radius:50%;border:2px solid var(--line);background:rgba(255,255,255,.05);color:var(--mist);font-weight:700;font-size:17px;display:grid;place-items:center;padding:0}
+.dot.lit{background:rgba(255,181,46,.2);border-color:rgba(255,181,46,.7);color:#ffd35e}
+.dot.cur{box-shadow:0 0 0 3px var(--text);color:var(--text)}
+
+/* final */
+#final{max-width:1100px;margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:4px}
+#final .menorah-slot{max-width:min(560px,100%)}
+#final .code-slot{max-width:min(620px,100%);margin:6px 0 14px}
+.final-msg{font-size:clamp(20px,1.4vw + 9px,34px);max-width:40ch;margin:.4em auto .8em;text-wrap:balance}
+.final-msg b{color:#ffd35e;font-family:var(--font-display);font-weight:400}
+.ranking{list-style:none;margin:0 auto;padding:0;display:grid;gap:8px;width:min(640px,100%);text-align:start}
+.ranking li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-inline-start:7px solid var(--tc);border-radius:16px;padding:.5em 1em;font-size:clamp(18px,1vw + 10px,28px)}
+.ranking li.first{background:rgba(255,181,46,.16);border-color:rgba(255,181,46,.6);border-inline-start-color:var(--tc)}
+.ranking .place{font-weight:600;color:var(--mist);font-size:.75em}
+.ranking .first .place{color:#ffd35e}
+.ranking .pts{font-weight:700;font-variant-numeric:tabular-nums}
+
+/* scores */
+.scores{flex:none;position:relative;z-index:2;background:rgba(6,9,32,.88);border-top:1px solid var(--line);padding:6px clamp(16px,2vw,32px);display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:10px}
+.team{display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px;padding:5px 10px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid transparent;border-inline-start:6px solid var(--tc)}
+.team.lead{background:rgba(255,181,46,.13);border-color:rgba(255,181,46,.5);border-inline-start-color:var(--tc)}
+.t-name{flex:1 1 100px;min-width:0;font-weight:600;font-size:clamp(16px,.7vw + 10px,22px);line-height:1.2;overflow-wrap:anywhere}
+.t-score{flex:none;font-weight:700;font-size:clamp(24px,1.6vw + 10px,38px);line-height:1;font-variant-numeric:tabular-nums}
+.t-score.bump{animation:bump .4s ease-out}
+@keyframes bump{40%{transform:scale(1.3);color:#ffd35e}}
+.t-ctl{flex:1 1 116px;display:flex;gap:4px}
+.t-ctl button{flex:1;min-height:32px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--text);font-weight:600;font-size:clamp(15px,.5vw + 10px,19px);padding:0 4px;direction:ltr}
+.t-ctl button.plus{background:rgba(255,181,46,.18);border-color:rgba(255,181,46,.45);color:#ffe2a0}
+.t-ctl button:hover{border-color:var(--mist)}
+
+/* modals and toast */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(4,6,24,.72);display:grid;place-items:center;padding:16px}
+.modal-box{background:var(--paper);color:var(--ink);border-radius:24px;width:min(760px,100%);max-height:calc(100% - 20px);overflow:auto;padding:clamp(18px,2.4vw,34px);position:relative;font-size:clamp(16px,.5vw + 12px,20px)}
+.modal-box.small{width:min(460px,100%)}
+.modal-box h2{font-family:var(--font-display);font-weight:400;margin:0 0 .4em;font-size:clamp(26px,2vw + 10px,40px);color:var(--ink)}
+.modal-box h3{margin:1.1em 0 .35em;color:#2335a8;font-size:1.1em}
+.modal-box p,.modal-box li{max-width:64ch}
+.modal-box ol,.modal-box ul{padding-inline-start:1.3em;margin:0;display:grid;gap:.35em}
+.modal-box .x{position:absolute;top:14px;left:14px;background:#fff;border:1.5px solid #c6d0ff;border-radius:999px;padding:.3em .9em;color:var(--ink);font-weight:600;min-height:40px}
+.modal-box details{margin-top:1.2em;background:#fff;border:1.5px solid #f0c7cd;border-radius:16px;padding:.6em 1em}
+.modal-box summary{cursor:pointer;font-weight:600;color:var(--bad)}
+.modal-box details ol{margin-top:.6em}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1em}
+.row .ghost{color:var(--ink);border-color:#c6d0ff}
+kbd{font-family:inherit;background:#fff;border:1.5px solid #c6d0ff;border-bottom-width:3px;border-radius:7px;padding:0 .4em;font-weight:600}
+.toast{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);z-index:45;background:var(--paper);color:var(--ink);padding:.6em 1.2em;border-radius:999px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:calc(100% - 32px);text-align:center}
+
+@media (min-width:980px){
+  #play,.play-grid{height:100%}
+}
+@media (max-width:979px){
+  .play-grid{grid-template-columns:1fr}
+  .side{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+}
+@media (max-width:760px){
+  .home-grid{grid-template-columns:1fr}
+  .names{grid-template-columns:1fr}
+  .scores{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .toast{bottom:24px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+/* light high-contrast mode, for bright classrooms and weak projectors */
+html.light{color-scheme:light;--text:#141a45;--mist:#2c3a9e}
+html.light body{background:#f7f4ec;background-image:none}
+html.light #stars{display:none}
+html.light .brand{color:#b04a00}
+html.light .ghost{background:#fff;border-color:#8e9bd8}
+html.light .ghost:hover{border-color:#141a45}
+html.light .title{background:linear-gradient(180deg,#e0780f 0%,#a63f00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:none}
+html.light .panel,html.light .side-box,html.light .side .menorah-slot{background:#fff;border:1.5px solid #c0caf5}
+html.light .panel h2{color:#b04a00}
+html.light .rules li::before{background:#ffe3b0;color:#7a3f00}
+html.light .seg button,html.light .name-field,html.light .t-btns button,html.light .t-ctl button,html.light .dot{background:#fff;border-color:#9aa6e0}
+html.light .seg button[aria-pressed="true"]{background:var(--flame);border-color:#b04a00;color:#2a1600}
+html.light .t-btns button.go{background:var(--flame);border-color:#b04a00;color:#2a1600}
+html.light .t-ctl button.plus{background:#ffe9bd;border-color:#d9962a;color:#6b3600}
+html.light .dot.lit{background:#ffe3b0;border-color:#d9962a;color:#6b3600}
+html.light .dot.cur{box-shadow:0 0 0 3px #141a45}
+html.light .t-bar{background:#dfe4ff}
+html.light .scores{background:#fff;border-top:2px solid #c0caf5}
+html.light .team{background:#f1f4ff;border-color:#c0caf5}
+html.light .team.lead{background:#ffe9bd;border-color:#d9962a}
+html.light .card{border:2px solid #c0caf5;box-shadow:0 10px 30px rgba(20,26,69,.15)}
+html.light .menorah .cnum.on{fill:#c25a00}
+html.light .menorah .wax{stroke:#7f8cc9;stroke-width:1.5}
+html.light .final-msg b{color:#b04a00}
+html.light .ranking li{background:#fff;border-color:#c0caf5}
+html.light .ranking li.first{background:#ffe9bd;border-color:#d9962a}
+html.light .ranking .first .place{color:#b04a00}
+html.light .name-field input::placeholder{color:#6b75b8}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="app">
+  <header class="topbar">
+    <button class="brand" id="brandBtn" type="button" title="למסך הפתיחה">חדר הבריחה של חנוכה</button>
+    <nav class="tools" aria-label="כלים למנחה">
+      <button class="ghost" id="guideBtn" type="button">מדריך למנחה</button>
+      <button class="ghost" id="themeBtn" type="button">מצב בהיר</button>
+      <button class="ghost" id="fsBtn" type="button">מסך מלא</button>
+      <button class="ghost" id="resetBtn" type="button">משחק חדש</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HOME -->
+    <section id="home" class="screen">
+      <div class="hero">
+        <p class="kicker">8 אתגרים · 8 נרות · מילת קוד אחת</p>
+        <h1 class="title">חדר הבריחה של חנוכה</h1>
+        <div class="menorah-slot" id="homeMenorah"></div>
+        <div class="code-slot" id="homeCode"></div>
+      </div>
+      <div class="home-grid">
+        <div class="panel">
+          <h2>המשימה</h2>
+          <p>חיילי אנטיוכוס נעלו את פך השמן האחרון בכספת סודית. הכספת נפתחת רק עם מילת קוד בת 8 אותיות.</p>
+          <p>לפניכם 8 אתגרים. כל אתגר שתפתרו ידליק נר בחנוכייה ויגלה עוד אות מהקוד.</p>
+          <ol class="rules">
+            <li>כל קבוצה כותבת את התשובה על דף ומרימה אותו.</li>
+            <li>הקבוצה הראשונה שצדקה מקבלת 10 נקודות. כל קבוצה נוספת שצדקה עד סוף הזמן מקבלת 5.</li>
+            <li>בונוס: גיליתם את מילת הקוד לפני הסוף? כתבו אותה על פתק ומסרו למנחה בשקט. ניחוש נכון שווה 20 נקודות, ולכל קבוצה יש ניחוש אחד בלבד!</li>
+          </ol>
+        </div>
+        <div class="panel setup">
+          <h2>הקבוצות</h2>
+          <span class="lbl" id="countLbl" style="display:block;color:var(--mist);font-weight:500;margin-bottom:.4em">כמה קבוצות משחקות?</span>
+          <div class="seg" id="teamCount" role="group" aria-labelledby="countLbl"></div>
+          <span class="lbl" style="display:block;color:var(--mist);font-weight:500;margin-bottom:.4em">שמות הקבוצות (אפשר לשנות)</span>
+          <div class="names" id="teamNames"></div>
+          <button class="cta" id="startBtn" type="button">מתחילים!</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAY -->
+    <section id="play" class="screen" hidden>
+      <div class="play-grid">
+        <article class="card" id="card" aria-live="polite"></article>
+        <aside class="side" aria-label="התקדמות">
+          <div class="menorah-slot" id="playMenorah"></div>
+          <div class="side-box">
+            <div class="code-label">מילת הקוד של הכספת</div>
+            <div class="code-slot" id="playCode"></div>
+          </div>
+          <div class="side-box timer" id="timer">
+            <div class="t-top"><span class="t-label">זמן לאתגר</span><span class="t-time" id="tTime">3:00</span></div>
+            <div class="t-bar"><i id="tBar"></i></div>
+            <div class="t-btns">
+              <button type="button" class="go" id="tStart">הפעלת טיימר</button>
+              <button type="button" id="tAdd">עוד 30 שניות</button>
+              <button type="button" id="tReset">איפוס</button>
+            </div>
+          </div>
+          <div class="dots" id="dots" aria-label="מעבר בין אתגרים"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section id="final" class="screen" hidden>
+      <p class="kicker" id="finalKicker">כל שמונת הנרות דולקים</p>
+      <h1 class="title" id="finalTitle">הכספת מחכה</h1>
+      <div class="menorah-slot" id="finalMenorah"></div>
+      <div class="code-slot" id="finalCode"></div>
+      <button class="cta" id="unlockBtn" type="button">פתיחת הכספת</button>
+      <div id="finalResult" hidden>
+        <p class="final-msg">מילת הקוד: <b>סופגניות</b>. הכספת נפתחה, פך השמן ניצל, ועכשיו אפשר לטגן סופגניות לכל הכיתה!</p>
+        <ol class="ranking" id="ranking"></ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="scores" id="scores" hidden aria-label="ניקוד הקבוצות"></footer>
+</div>
+
+<!-- guide -->
+<div class="modal" id="guideModal" hidden role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+  <div class="modal-box">
+    <button class="x" type="button" data-close>סגירה</button>
+    <h2 id="guideTitle">מדריך למנחה</h2>
+    <p>משחק לכיתה ה', בערך 45 דקות. צריך מקרן או לוח חכם, ודף ועט לכל קבוצה.</p>
+    <h3>מהלך המשחק</h3>
+    <ol>
+      <li>מחלקים את הכיתה ל-4 עד 6 קבוצות, ומזינים את שמות הקבוצות במסך הפתיחה.</li>
+      <li>קוראים בקול את סיפור המשימה ולוחצים "מתחילים".</li>
+      <li>בכל אתגר: קוראים אותו בקול, מפעילים טיימר, והקבוצות כותבות תשובה ומרימות את הדף.</li>
+      <li>ניקוד: הקבוצה הראשונה שצדקה מקבלת 10 נקודות, וכל קבוצה נוספת שצדקה עד סוף הזמן מקבלת 5. מוסיפים נקודות בכפתורים שבתחתית המסך.</li>
+      <li>חושפים את התשובה ומדליקים את הנר. כל נר חושף אות נוספת במילת הקוד.</li>
+      <li>בונוס: קבוצה שחושבת שגילתה את מילת הקוד כותבת אותה על פתק ומוסרת למנחה בשקט. ניחוש נכון שווה 20 נקודות (שתי לחיצות על 10+). לכל קבוצה ניחוש אחד.</li>
+      <li>אחרי הנר השמיני עוברים לכספת, פותחים אותה ומכריזים על המנצחים.</li>
+    </ol>
+    <h3>טיפים</h3>
+    <ul>
+      <li>קבוצה תקועה? אחרי דקה-שתיים אפשר לחשוף רמז לכולם.</li>
+      <li>חסר זמן? אפשר לדלג על אתגר: פשוט חושפים את התשובה ומדליקים את הנר.</li>
+      <li>כדאי להכין הפתעה קטנה לרגע שבו הכספת נפתחת. מילת הקוד רשומה בתשובות למטה.</li>
+      <li>מקשי קיצור: <kbd>←</kbd> האתגר הבא, <kbd>→</kbd> האתגר הקודם, <kbd>רווח</kbd> הפעלה או עצירה של הטיימר.</li>
+      <li>הטקסט בכל אתגר מתאים את עצמו לגודל המסך, כך שלא צריך לגלול. בכיתה מוארת או עם מקרן חלש כדאי ללחוץ על "מצב בהיר".</li>
+      <li>הניקוד והנרות נשמרים בדפדפן הזה, כך שאם העמוד נסגר בטעות, בדרך כלל אפשר להמשיך מאותה נקודה.</li>
+    </ul>
+    <details>
+      <summary>כל התשובות (לא לפתוח כשהמסך מוקרן!)</summary>
+      <ol id="answerList"></ol>
+    </details>
+  </div>
+</div>
+
+<div class="modal" id="resetModal" hidden role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+  <div class="modal-box small">
+    <h2 id="resetTitle">להתחיל משחק חדש?</h2>
+    <p>הנקודות והנרות יתאפסו. שמות הקבוצות יישארו.</p>
+    <div class="row">
+      <button class="cta" type="button" id="resetYes">כן, משחק חדש</button>
+      <button class="ghost" type="button" data-close>ביטול</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden role="status"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- content ---------- */
+const tiles = w => w.split('').map(ch => `<span class="tile">${ch}</span>`).join('');
+const ATBASH = [['א','ת'],['ב','ש'],['ג','ר'],['ד','ק'],['ה','צ'],['ו','פ'],['ז','ע'],['ח','ס'],['ט','נ'],['י','מ'],['כ','ל']];
+const sticks = n => '<span class="stick"></span>'.repeat(n) + '<span class="stick sham" title="שמש"></span>';
+
+const CH = [
+  {
+    type:'חידות בחרוזים', title:'מי אני?', time:120, letter:'ת', slot:7,
+    body:`<p>שתי חידות לחימום. כל קבוצה כותבת שתי תשובות.</p>
+      <div class="riddles">
+        <figure class="riddle"><figcaption>חידה 1</figcaption>
+          <p>על רגל אחת אני רוקד, מסתובב בלי סוף,<br>עד שאני מתעייף ונופל על הצד - הופ!<br>ארבע אותיות כתובות לי על הצדדים,<br>וכשאני נופל - מנצחים או מפסידים!</p>
+          <p class="who">מי אני?</p></figure>
+        <figure class="riddle"><figcaption>חידה 2</figcaption>
+          <p>אני לא נספר בין שמונת הנרות,<br>אבל בלעדיי - אין הדלקות!<br>אני עומד גבוה, קצת בצד,<br>ומדליק את כולם, אחד-אחד.</p>
+          <p class="who">מי אני?</p></figure>
+      </div>`,
+    hint:'חידה 1: משחקים בו בחנוכה. חידה 2: הוא לא אחד משמונת הנרות, אבל בלי אותו אי אפשר להדליק אותם.',
+    answer:'1. סביבון &nbsp; 2. השמש',
+    short:'סביבון, השמש',
+    explain:'השמש הוא הנר שבעזרתו מדליקים את כל שאר הנרות. הוא עומד גבוה או בצד, כדי שיהיה ברור שהוא לא אחד מנרות החג.'
+  },
+  {
+    type:'פיצוח צופן', title:'ההודעה הסודית', time:240, letter:'נ', slot:4,
+    body:`<p>בבית המקדש נמצא פתק מוצפן בצופן <b>אתב"ש</b>: האות הראשונה מתחלפת באחרונה, השנייה בלפני-אחרונה, וכך הלאה. פענחו את שם הגיבור!</p>
+      <div class="cipher" aria-label="ההודעה המוצפנת"><div>${tiles('מצפקצ')}</div><div>${tiles('צילשמ')}</div></div>
+      <div class="keytable" aria-label="מפתח הצופן">${ATBASH.map(p => `<span class="pair"><span>${p[0]}</span><i>⇄</i><span>${p[1]}</span></span>`).join('')}</div>
+      <p class="note">בצופן כותבים בלי אותיות סופיות.</p>`,
+    hint:'האות מ מתחלפת ב-י, והאות צ מתחלפת ב-ה. המילה הראשונה היא שם פרטי.',
+    answer:'יהודה המכבי',
+    short:'יהודה המכבי',
+    explain:'יהודה המכבי, בנו של מתתיהו, עמד בראש המכבים במרד נגד היוונים. צופן אתב"ש עתיק מאוד: הוא מופיע כבר בתנ"ך, בספר ירמיהו.'
+  },
+  {
+    type:'חשבון חכם', title:'כמה נרות בקופסה?', time:180, letter:'ו', slot:1,
+    body:`<p>בכל ערב של חנוכה מדליקים נר אחד יותר: בערב הראשון נר אחד, בערב השני שני נרות, וכך עד שמונה נרות בערב האחרון. ובכל ערב מדליקים גם את <b>השמש</b>.</p>
+      <div class="nights" aria-hidden="true">
+        <div class="night"><span class="lb">ערב 1</span>${sticks(1)}</div>
+        <div class="night"><span class="lb">ערב 2</span>${sticks(2)}</div>
+        <div class="night"><span class="lb">ערב 3</span>${sticks(3)}</div>
+        <div class="dots-row">⋮</div>
+        <div class="night"><span class="lb">ערב 8</span><span class="q">?</span></div>
+      </div>
+      <p class="ask">כמה נרות צריך בסך הכול לכל שמונת ימי החנוכה?</p>`,
+    hint:'אל תשכחו את השמש: הוא נדלק מחדש בכל אחד משמונת הערבים.',
+    answer:'44 נרות',
+    short:'44 נרות',
+    explain:'1+2+3+4+5+6+7+8 = 36 נרות, ועוד 8 שמשים = 44. טריק מהיר: 1+8, 2+7, 3+6, 4+5 הם ארבעה זוגות של 9, כלומר 36. ובאמת, בקופסת נרות חנוכה רגילה יש בדיוק 44 נרות!'
+  },
+  {
+    type:'מילים מבולבלות', title:'מישהו ערבב את האותיות', time:300, letter:'י', slot:5,
+    body:`<p>סדרו את האותיות וגלו ארבע מילים מעולם החנוכה.</p>
+      <div class="anagrams">
+        <div class="arow"><span class="anum">1</span><div>${tiles('בתילוב')}</div></div>
+        <div class="arow"><span class="anum">2</span><div>${tiles('יהכחיונ')}</div></div>
+        <div class="arow"><span class="anum">3</span><div>${tiles('ימבכמ')}</div></div>
+        <div class="arow"><span class="anum">4</span><div>${tiles('וסאכיטונ')}</div></div>
+      </div>
+      <p class="note">אותיות סופיות כתובות כאן כמו אותיות רגילות.</p>`,
+    hint:'יש כאן מאכל, חפץ, לוחמים ומלך. האותיות הראשונות של המילים: ל, ח, מ, א.',
+    answer:'לביבות · חנוכייה · מכבים · אנטיוכוס',
+    short:'לביבות, חנוכייה, מכבים, אנטיוכוס',
+    explain:'המכבים הם הלוחמים של מתתיהו ובניו, שמרדו ביוונים ושחררו את ירושלים. אנטיוכוס הוא המלך היווני שנגדו נלחמו. (גם "חנוכיה" עם י\' אחת נחשבת תשובה נכונה.)'
+  },
+  {
+    type:'חשיבה מחוץ לקופסה', title:'רוח בחלון', time:120, letter:'ג', slot:3,
+    body:`<p>בחנוכייה של סבתא דלקו 8 נרות (בלי לספור את השמש). פתאום נפתח החלון, נשבה רוח חזקה, ו-3 נרות כבו.</p>
+      <p>סבתא החליטה לא להדליק אותם מחדש.</p>
+      <p class="ask">כמה נרות נשארו בחנוכייה בסוף הערב?</p>`,
+    hint:'מה קורה בסוף הערב לנר שממשיך לדלוק?',
+    answer:'3 נרות',
+    short:'3 נרות',
+    explain:'5 הנרות שהמשיכו לדלוק נמסו עד הסוף ונעלמו. נשארו רק 3 הנרות שכבו! ועובדה מעניינת: לפי ההלכה, נר חנוכה שכבה לא חייבים להדליק מחדש.'
+  },
+  {
+    type:'בלשי היסטוריה', title:'4 טעויות בסיפור', time:240, letter:'ס', slot:0,
+    body:`<p>מישהו כתב את סיפור החנוכה ופיזר בו <b>4 טעויות</b>. מצאו את כולן!</p>
+      <div class="story">
+        <p>לפני כ-2,200 שנה שלט בארץ ישראל המלך היווני אנטיוכוס, שאסר על היהודים לשמור על מצוות התורה. בכפר מודיעין קם הכוהן מתתיהו, ויחד עם חמשת בניו יצא למרד. בראש הלוחמים עמד <span class="err"><s>שמשון הגיבור</s><ins>יהודה המכבי</ins></span>, שהוביל את המכבים מניצחון לניצחון.</p>
+        <p>כשהמכבים שחררו את ירושלים, הם טיהרו את בית המקדש ורצו להדליק את המנורה. הם מצאו רק פך שמן אחד קטן, שהספיק ליום אחד בלבד, אבל בדרך נס הוא דלק <span class="err"><s>שלושה ימים</s><ins>שמונה ימים</ins></span>!</p>
+        <p>לזכר הנס אנחנו חוגגים את חנוכה החל מ<span class="err"><s>כ"ה בניסן</s><ins>כ"ה בכסלו</ins></span>, מדליקים נרות בחנוכייה ואוכלים <span class="err"><s>מצות</s><ins>מאכלים מטוגנים בשמן</ins></span>.</p>
+      </div>`,
+    hint:'חפשו שם של גיבור, מספר, תאריך ומאכל.',
+    answer:'הטעויות מסומנות בסיפור',
+    short:'שמשון ← יהודה המכבי, שלושה ימים ← שמונה, ניסן ← כסלו, מצות ← מאכלים בשמן',
+    explain:`<ul>
+        <li><s>שמשון הגיבור</s> ← <strong>יהודה המכבי</strong> (שמשון חי מאות שנים קודם, בתקופת השופטים)</li>
+        <li><s>שלושה ימים</s> ← <strong>שמונה ימים</strong></li>
+        <li><s>כ"ה בניסן</s> ← <strong>כ"ה בכסלו</strong> (ניסן הוא החודש של פסח)</li>
+        <li><s>מצות</s> ← <strong>מאכלים מטוגנים בשמן</strong>, כמו לביבות (מצות אוכלים בפסח)</li>
+      </ul>`
+  },
+  {
+    type:'חידת היגיון', title:'מי לקח את כל הקופה?', time:240, letter:'פ', slot:2,
+    body:`<p>ארבעה ילדים סובבו סביבון: דנה, יואב, נועה ועומר. כל אחד קיבל אות אחרת.</p>
+      <div class="rules-box">
+        <span><span class="tile">נ</span> לא לוקחים כלום</span>
+        <span><span class="tile">ג</span> לוקחים את כל הקופה</span>
+        <span><span class="tile">ה</span> לוקחים חצי</span>
+        <span><span class="tile">פ</span> שמים מטבע בקופה</span>
+      </div>
+      <ol class="clues">
+        <li>האות של נועה מופיעה בשם שלה.</li>
+        <li>גם האות של דנה מופיעה בשם שלה, והיא הרוויחה משהו מהקופה.</li>
+        <li>עומר נאלץ לשים מטבע בקופה.</li>
+      </ol>
+      <p class="ask">איזו אות קיבל כל ילד? ומי לקח את כל הקופה?</p>`,
+    hint:'התחילו מעומר. אחר כך בדקו אילו אותיות יש בשם "דנה".',
+    answer:'יואב לקח את כל הקופה!',
+    short:'יואב (ג). דנה ה, נועה נ, עומר פ',
+    explain:`<div class="kids"><span>דנה - ה</span><span>יואב - ג</span><span>נועה - נ</span><span>עומר - פ</span></div>
+      עומר שם מטבע, אז הוא קיבל פ. בשם "דנה" יש נ ו-ה, והיא הרוויחה משהו, אז היא קיבלה ה (חצי). לנועה נשארה נ, שבאמת מופיעה בשם שלה. וליואב נשארה ג: כל הקופה!`
+  },
+  {
+    type:'חידה מכשילה', title:'כמה שוקלת לביבה?', time:150, letter:'ו', slot:6,
+    body:`<p class="big">לביבה אחת שוקלת <b>40 גרם</b> ועוד <b>חצי לביבה</b>.</p>
+      <p class="ask">כמה שוקלת לביבה שלמה?</p>
+      <p class="note">זהירות, זו חידה מכשילה! חשבו טוב לפני שאתם עונים.</p>`,
+    hint:'לביבה שלמה = חצי לביבה + עוד חצי לביבה. אחד החצאים הוא ה"חצי לביבה" מהחידה. כמה שוקל החצי השני?',
+    answer:'80 גרם',
+    short:'80 גרם',
+    explain:'החצי השני של הלביבה שוקל 40 גרם, ולכן גם החצי הראשון שוקל 40 גרם. ביחד: 80 גרם. התשובה הנפוצה (והשגויה) היא 60!'
+  }
+];
+const CODE = ['ס','ו','פ','ג','נ','י','ו','ת'];
+const DEFAULT_NAMES = ['המכבים','הסביבונים','הלביבות','פכי השמן','הנרות','השמשים'];
+const TEAM_COLORS = ['#7aa2ff','#ffb52e','#4fd1a1','#ff7f9e','#b58cff','#6fd8ff'];
+const CANDLE_X = [890,790,690,590,410,310,210,110];
+const STORE_KEY = 'hanukkah-escape-room-v1';
+
+/* ---------- state ---------- */
+function freshState(prev){
+  return {
+    screen:'home',
+    teamCount: prev ? prev.teamCount : 4,
+    teams: DEFAULT_NAMES.map((n,k) => ({name: prev ? prev.teams[k].name : n, score:0})),
+    current:0,
+    hint:Array(8).fill(false),
+    ans:Array(8).fill(false),
+    lit:Array(8).fill(false),
+    unlocked:false
+  };
+}
+let state = freshState();
+
+function normalize(s){
+  const b = freshState();
+  try{
+    if(['home','play','final'].includes(s.screen)) b.screen = s.screen;
+    if(Number.isInteger(s.teamCount) && s.teamCount>=2 && s.teamCount<=6) b.teamCount = s.teamCount;
+    if(Array.isArray(s.teams)) s.teams.slice(0,6).forEach((t,k) => { if(t){ b.teams[k].name = typeof t.name==='string' ? t.name.slice(0,24) : b.teams[k].name; b.teams[k].score = Number.isFinite(t.score) ? t.score : 0; } });
+    if(Number.isInteger(s.current) && s.current>=0 && s.current<8) b.current = s.current;
+    ['hint','ans','lit'].forEach(key => { if(Array.isArray(s[key])) for(let i=0;i<8;i++) b[key][i] = !!s[key][i]; });
+    b.unlocked = !!s.unlocked;
+  }catch(e){}
+  return b;
+}
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+function loadLocal(){ try{ const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const teamName = k => (state.teams[k].name || '').trim() || DEFAULT_NAMES[k];
+const allLit = () => state.lit.every(Boolean);
+const gameStarted = () => state.lit.some(Boolean) || state.ans.some(Boolean) || state.teams.some(t => t.score>0);
+
+/* ---------- menorah ---------- */
+let menorahEl, codeEl;
+function candleG(x, top, col, idx, delay){
+  const isSham = idx === 's';
+  return `<g class="candle${isSham ? ' lit' : ''}"${isSham ? '' : ` data-i="${idx}"`}>
+    <rect class="wax" x="${x-12}" y="${top}" width="24" height="100" rx="5" fill="${col}"/>
+    <rect x="${x-7}" y="${top+6}" width="5" height="88" rx="2.5" fill="#fff" opacity=".35"/>
+    <line x1="${x}" y1="${top}" x2="${x}" y2="${top-10}" stroke="#2b2b3a" stroke-width="3" stroke-linecap="round"/>
+    <g transform="translate(${x},${top-8})"><g class="ignite">
+      <circle class="halo" cx="0" cy="-24" r="48" fill="url(#halo)"/>
+      <g class="flicker" style="animation-delay:-${delay}s">
+        <path d="M0,-58 C17,-36 21,-17 0,2 C-21,-17 -17,-36 0,-58Z" fill="url(#flameG)"/>
+        <path d="M0,-28 C8,-18 9,-9 0,0 C-9,-9 -8,-18 0,-28Z" fill="#fff8de"/>
+      </g>
+    </g></g>
+  </g>`;
+}
+function buildMenorah(){
+  let cups = '', candles = '', labels = '';
+  CANDLE_X.forEach((x,i) => {
+    cups += `<path d="M${x-28} 246 h56 l-7 24 h-42z" fill="url(#brass)"/>`;
+    candles += candleG(x, 146, i%2===0 ? '#7aa2ff' : '#eef2ff', i, (i*0.37).toFixed(2));
+    labels += `<text class="cnum" data-i="${i}" x="${x}" y="324">${i+1}</text>`;
+  });
+  const svg = `<svg class="menorah" viewBox="0 -50 1000 470" role="img" aria-label="חנוכייה">
+    <defs>
+      <radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffb52e" stop-opacity=".5"/><stop offset="1" stop-color="#ffb52e" stop-opacity="0"/></radialGradient>
+      <radialGradient id="halo"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset=".4" stop-color="#ff9d2e" stop-opacity=".32"/><stop offset="1" stop-color="#ff7b1c" stop-opacity="0"/></radialGradient>
+      <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe29a"/><stop offset=".5" stop-color="#e0a93a"/><stop offset="1" stop-color="#a86d16"/></linearGradient>
+      <linearGradient id="flameG" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff6a00"/><stop offset=".55" stop-color="#ffb52e"/><stop offset="1" stop-color="#fff3c4"/></linearGradient>
+    </defs>
+    <ellipse class="aura" cx="500" cy="170" rx="540" ry="250" fill="url(#aura)"/>
+    <path d="M425 410 h150 l-32 -28 h-86z" fill="url(#brass)"/>
+    <rect x="488" y="282" width="24" height="102" rx="6" fill="url(#brass)"/>
+    <rect x="70" y="268" width="860" height="18" rx="9" fill="url(#brass)"/>
+    <rect x="489" y="184" width="22" height="88" rx="5" fill="url(#brass)"/>
+    ${cups}
+    <path d="M472 162 h56 l-7 24 h-42z" fill="url(#brass)"/>
+    ${candles}
+    ${candleG(500, 62, '#ffd35e', 's', '0.9')}
+    ${labels}
+  </svg>`;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = svg;
+  menorahEl = wrap.firstElementChild;
+
+  codeEl = document.createElement('div');
+  codeEl.className = 'code';
+  codeEl.setAttribute('role','list');
+  codeEl.setAttribute('aria-label','מילת הקוד');
+  for(let p=0;p<8;p++){
+    const t = document.createElement('div');
+    t.className = 'tumbler';
+    t.setAttribute('role','listitem');
+    t.style.setProperty('--d', p);
+    t.textContent = '?';
+    codeEl.appendChild(t);
+  }
+}
+function updateMenorah(){
+  const n = state.lit.filter(Boolean).length;
+  menorahEl.querySelectorAll('.candle[data-i]').forEach(g => g.classList.toggle('lit', state.lit[+g.dataset.i]));
+  menorahEl.querySelectorAll('.cnum').forEach(t => t.classList.toggle('on', state.lit[+t.dataset.i]));
+  menorahEl.querySelector('.aura').style.opacity = (0.22 + 0.78 * n / 8).toFixed(2);
+}
+function updateCode(){
+  const tumblers = codeEl.children;
+  CH.forEach((c,i) => {
+    const t = tumblers[c.slot];
+    const on = state.lit[i];
+    if(on && !t.classList.contains('on')){ t.classList.add('on'); t.textContent = c.letter; t.setAttribute('aria-label', c.letter); }
+    if(!on && t.classList.contains('on')){ t.classList.remove('on'); t.textContent = '?'; t.setAttribute('aria-label','אות חסרה'); }
+    if(!on) t.setAttribute('aria-label','אות חסרה');
+  });
+}
+
+/* ---------- screens ---------- */
+const SLOTS = {home:['homeMenorah','homeCode'], play:['playMenorah','playCode'], final:['finalMenorah','finalCode']};
+function showScreen(name){
+  state.screen = name; save();
+  ['home','play','final'].forEach(s => { $(s).hidden = s !== name; });
+  $(SLOTS[name][0]).appendChild(menorahEl);
+  $(SLOTS[name][1]).appendChild(codeEl);
+  $('scores').hidden = name === 'home' || (name === 'final' && state.unlocked);
+  $('resetBtn').hidden = name === 'home' && !gameStarted();
+  if(name === 'home') renderHome();
+  if(name === 'play'){ renderPlay(true); timerSet(CH[state.current].time); }
+  if(name === 'final'){ timerStop(); renderFinal(); }
+  renderScores();
+  $('main').scrollTop = 0;
+}
+
+function renderHome(){
+  $('teamCount').innerHTML = [2,3,4,5,6].map(n => `<button type="button" data-n="${n}" aria-pressed="${n===state.teamCount}">${n}</button>`).join('');
+  let html = '';
+  for(let k=0;k<state.teamCount;k++){
+    html += `<div class="name-field" style="--tc:${TEAM_COLORS[k]}"><label class="sr" for="team-name-${k+1}" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">קבוצה ${k+1}</label><input id="team-name-${k+1}" data-k="${k}" maxlength="18" value="${esc(state.teams[k].name)}" placeholder="${DEFAULT_NAMES[k]}"></div>`;
+  }
+  $('teamNames').innerHTML = html;
+  $('startBtn').textContent = gameStarted() ? 'ממשיכים במשחק' : 'מתחילים!';
+}
+
+function renderPlay(enter){
+  renderCard(enter);
+  renderDots();
+  updateMenorah();
+  updateCode();
+}
+
+function renderCard(enter){
+  const i = state.current, c = CH[i];
+  const card = $('card');
+  card.className = 'card' + (state.ans[i] ? ' revealed' : '') + (enter ? ' enter' : '');
+  const unlit = state.lit.map((l,k) => l ? null : k+1).filter(Boolean);
+  let nav;
+  if(i < 7){
+    nav = `<button type="button" class="btn nav-btn next" data-act="next">האתגר הבא ←</button>`;
+  }else{
+    nav = `<button type="button" class="btn nav-btn vault" data-act="vault" ${allLit() ? '' : 'disabled'}>לכספת ←</button>`;
+  }
+  card.innerHTML = `
+    <span class="eyebrow">נר ${i+1} מתוך 8 · ${c.type}</span>
+    <h2 class="c-title">${c.title}</h2>
+    <div class="c-body">${c.body}</div>
+    <div class="c-actions">
+      <button type="button" class="btn hint-btn" data-act="hint" ${state.hint[i] ? 'disabled' : ''}>רמז</button>
+      <button type="button" class="btn ans-btn" data-act="answer" ${state.ans[i] ? 'disabled' : ''}>חשיפת התשובה</button>
+    </div>
+    ${state.hint[i] ? `<div class="hint-box" id="hintBox"><b>רמז:</b> ${c.hint}</div>` : ''}
+    ${state.ans[i] ? `<div class="ans-box" id="ansBox">
+        <div class="ans-label">התשובה</div>
+        <div class="ans-main">${c.answer}</div>
+        <div class="ans-explain">${c.explain}</div>
+        ${state.lit[i]
+          ? `<div class="lit-note">הנר דולק! האות שנחשפה: <span class="tumbler on">${c.letter}</span></div>`
+          : `<button type="button" class="cta light-btn" data-act="light">הדלקת נר ${i+1}</button>`}
+      </div>` : ''}
+    <div class="c-nav">
+      <button type="button" class="btn nav-btn" data-act="prev" ${i===0 ? 'disabled' : ''}>→ הקודם</button>
+      ${nav}
+      ${i===7 && !allLit() ? `<span class="nav-note">כדי לפתוח את הכספת צריך שכל הנרות ידלקו. נרות שעוד כבויים: ${unlit.join(', ')}</span>` : ''}
+    </div>`;
+  if(enter) card.scrollTop = 0;
+  fitCard();
+}
+
+/* Fit the card to the screen: use the largest text size that needs no scrolling. */
+function fitCard(){
+  const card = $('card'), main = $('main');
+  if(!card || !main || $('play').hidden) return;
+  let fit = 1;
+  if(window.matchMedia('(min-width:980px)').matches){
+    const cs = getComputedStyle(main);
+    const avail = main.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 2;
+    const over = () => card.offsetHeight > avail;
+    let lo = 0.45, hi = 1.4;
+    card.style.setProperty('--fit', hi);
+    if(!over()){ fit = hi; }
+    else{
+      for(let k=0;k<9;k++){
+        const mid = (lo + hi) / 2;
+        card.style.setProperty('--fit', mid);
+        if(over()) hi = mid; else lo = mid;
+      }
+      fit = lo;
+    }
+  }
+  card.style.setProperty('--fit', fit);
+}
+
+function renderDots(){
+  $('dots').innerHTML = CH.map((c,i) => `<button type="button" class="dot${state.lit[i] ? ' lit' : ''}${i===state.current ? ' cur' : ''}" data-go="${i}" aria-label="אתגר ${i+1}${state.lit[i] ? ', נפתר' : ''}"${i===state.current ? ' aria-current="step"' : ''}>${i+1}</button>`).join('');
+}
+
+function renderScores(){
+  const n = state.teamCount;
+  const el = $('scores');
+  el.style.setProperty('--n', n);
+  const scores = state.teams.slice(0,n).map(t => t.score);
+  const max = Math.max(...scores);
+  el.innerHTML = state.teams.slice(0,n).map((t,k) => `
+    <div class="team${max>0 && t.score===max ? ' lead' : ''}" style="--tc:${TEAM_COLORS[k]}">
+      <div class="t-name">${esc(teamName(k))}</div>
+      <div class="t-score" id="score-${k}">${t.score}</div>
+      <div class="t-ctl">
+        <button type="button" data-k="${k}" data-d="-5" aria-label="הורדת 5 נקודות ל${esc(teamName(k))}">-5</button>
+        <button type="button" class="plus" data-k="${k}" data-d="5" aria-label="5 נקודות ל${esc(teamName(k))}">+5</button>
+        <button type="button" class="plus" data-k="${k}" data-d="10" aria-label="10 נקודות ל${esc(teamName(k))}">+10</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderFinal(){
+  const n = state.lit.filter(Boolean).length;
+  $('finalKicker').textContent = n===8 ? 'כל שמונת הנרות דולקים' : `דולקים ${n} מתוך 8 נרות`;
+  $('finalTitle').textContent = state.unlocked ? 'הכספת נפתחה!' : 'הכספת מחכה';
+  $('unlockBtn').hidden = state.unlocked;
+  $('unlockBtn').disabled = n !== 8;
+  $('finalResult').hidden = !state.unlocked;
+  codeEl.classList.toggle('open', state.unlocked);
+  updateMenorah(); updateCode();
+  const rows = state.teams.slice(0,state.teamCount).map((t,k) => ({k, name:teamName(k), score:t.score})).sort((a,b) => b.score - a.score);
+  let place = 0, prev = null;
+  $('ranking').innerHTML = rows.map((r,idx) => {
+    if(r.score !== prev){ place = idx+1; prev = r.score; }
+    return `<li class="${place===1 ? 'first' : ''}" style="--tc:${TEAM_COLORS[r.k]}"><span class="place">מקום ${place}</span><span>${esc(r.name)}</span><span class="pts">${r.score}</span></li>`;
+  }).join('');
+}
+
+/* ---------- actions ---------- */
+function goTo(i){
+  if(i<0 || i>7) return;
+  state.current = i; save();
+  renderPlay(true);
+  timerSet(CH[i].time);
+}
+function lightCandle(i){
+  ensureAudio();
+  state.lit[i] = true; state.ans[i] = true; save();
+  updateMenorah(); updateCode();
+  renderCard(false); renderDots();
+  chime();
+  timerStop();
+  if(allLit()) toast('כל הנרות דולקים! אפשר לעבור לכספת');
+}
+function unlock(){
+  ensureAudio();
+  state.unlocked = true; save();
+  renderFinal();
+  $('scores').hidden = true;
+  fanfare();
+  confetti();
+  setTimeout(() => { const r = $('finalResult'); if(r) r.scrollIntoView({block:'end', behavior:'smooth'}); }, 900);
+}
+function addScore(k, d){
+  state.teams[k].score = Math.max(0, state.teams[k].score + d); save();
+  renderScores();
+  const s = $('score-'+k);
+  if(s){ s.classList.remove('bump'); void s.offsetWidth; s.classList.add('bump'); }
+}
+function resetGame(){
+  const keep = {teamCount:state.teamCount, teams:state.teams};
+  state = freshState(keep);
+  codeEl.classList.remove('open');
+  save();
+  updateMenorah(); updateCode();
+  closeModals();
+  showScreen('home');
+}
+
+/* ---------- timer ---------- */
+const T = {total:0, remaining:0, running:false, id:null, last:0, up:false};
+function timerSet(sec){ timerStop(); T.total = sec; T.remaining = sec; T.up = false; renderTimer(); }
+function timerStart(){
+  ensureAudio();
+  if(T.remaining <= 0){ T.remaining = T.total; T.up = false; }
+  T.running = true; T.last = performance.now();
+  clearInterval(T.id); T.id = setInterval(tick, 250);
+  renderTimer();
+}
+function timerStop(){ T.running = false; clearInterval(T.id); T.id = null; renderTimer(); }
+function tick(){
+  const now = performance.now();
+  T.remaining -= (now - T.last) / 1000; T.last = now;
+  if(T.remaining <= 0){ T.remaining = 0; T.up = true; timerStop(); beep(); return; }
+  renderTimer();
+}
+function renderTimer(){
+  const s = Math.max(0, Math.ceil(T.remaining));
+  $('tTime').textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  $('tBar').style.width = (T.total ? Math.max(0, T.remaining / T.total * 100) : 0) + '%';
+  $('timer').classList.toggle('up', T.up);
+  const b = $('tStart');
+  b.textContent = T.running ? 'עצירה' : (T.remaining > 0 && T.remaining < T.total ? 'המשך' : 'הפעלת טיימר');
+  b.classList.toggle('go', !T.running);
+}
+
+/* ---------- sound ---------- */
+let actx = null;
+function ensureAudio(){
+  try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === 'suspended') actx.resume(); }catch(e){ actx = null; }
+}
+function tone(freq, at, dur, vol, type){
+  if(!actx) return;
+  try{
+    const o = actx.createOscillator(), g = actx.createGain(), t0 = actx.currentTime + at;
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t0); o.stop(t0 + dur + 0.02);
+  }catch(e){}
+}
+function beep(){ [0, .28, .56].forEach(t => tone(880, t, .2, .25, 'square')); }
+function chime(){ tone(784, 0, .5, .2); tone(1175, .12, .7, .18); }
+function fanfare(){ [523,659,784,1047].forEach((f,i) => tone(f, i*.13, .6, .18, 'triangle')); }
+
+/* ---------- confetti and stars ---------- */
+function confetti(){
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('confetti'), ctx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+  const colors = ['#ffd35e','#ffb52e','#ff7b1c','#7aa2ff','#ffffff','#a9bbff'];
+  const parts = Array.from({length:170}, () => ({
+    x: Math.random()*innerWidth, y: -20 - Math.random()*innerHeight*0.5,
+    vx: (Math.random()-.5)*2.4, vy: 2 + Math.random()*3.5,
+    w: 6 + Math.random()*8, h: 8 + Math.random()*10,
+    r: Math.random()*Math.PI, vr: (Math.random()-.5)*.25,
+    c: colors[Math.floor(Math.random()*colors.length)]
+  }));
+  const t0 = performance.now();
+  (function frame(now){
+    const el = now - t0;
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += .03; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+      ctx.globalAlpha = Math.max(0, 1 - Math.max(0, el-3200)/1000);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    });
+    if(el < 4200) requestAnimationFrame(frame); else ctx.clearRect(0,0,innerWidth,innerHeight);
+  })(t0);
+}
+function drawStars(){
+  const cv = $('stars'), ctx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio || 1, w = innerWidth, h = innerHeight;
+  cv.width = w*dpr; cv.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  let seed = 7;
+  const rnd = () => { seed = (seed*16807) % 2147483647; return (seed-1)/2147483646; };
+  const count = Math.round(w*h/7000);
+  for(let i=0;i<count;i++){
+    const x = rnd()*w, y = rnd()*h*0.85, r = .4 + rnd()*1.2;
+    ctx.globalAlpha = (.15 + rnd()*.6) * (1 - y/(h*1.1));
+    ctx.fillStyle = '#d6deff';
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+}
+
+/* ---------- modals, toast, fullscreen ---------- */
+function openModal(id){ $(id).hidden = false; const f = $(id).querySelector('button'); if(f) f.focus(); }
+function closeModals(){ document.querySelectorAll('.modal').forEach(m => m.hidden = true); }
+let toastT;
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3200); }
+function toggleFullscreen(){
+  try{
+    if(document.fullscreenElement){ document.exitFullscreen().catch(() => {}); return; }
+    const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+    if(p && p.catch) p.catch(() => toast('המסך המלא חסום כאן. אפשר ללחוץ F11 במקלדת'));
+    else if(!p) toast('המסך המלא חסום כאן. אפשר ללחוץ F11 במקלדת');
+  }catch(e){ toast('המסך המלא חסום כאן. אפשר ללחוץ F11 במקלדת'); }
+}
+
+/* ---------- theme ---------- */
+const THEME_KEY = 'hanukkah-escape-room-theme';
+function setTheme(light){
+  document.documentElement.classList.toggle('light', light);
+  $('themeBtn').textContent = light ? 'מצב כהה' : 'מצב בהיר';
+  try{ localStorage.setItem(THEME_KEY, light ? 'light' : 'dark'); }catch(e){}
+}
+function initTheme(){
+  let light = false;
+  try{ light = localStorage.getItem(THEME_KEY) === 'light'; }catch(e){}
+  setTheme(light);
+}
+
+/* ---------- events ---------- */
+function bind(){
+  $('brandBtn').addEventListener('click', () => showScreen('home'));
+  $('guideBtn').addEventListener('click', () => openModal('guideModal'));
+  $('resetBtn').addEventListener('click', () => openModal('resetModal'));
+  $('resetYes').addEventListener('click', resetGame);
+  $('fsBtn').addEventListener('click', toggleFullscreen);
+  $('themeBtn').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('light')));
+  document.addEventListener('fullscreenchange', () => { $('fsBtn').textContent = document.fullscreenElement ? 'יציאה ממסך מלא' : 'מסך מלא'; });
+  document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if(e.target === m || e.target.closest('[data-close]')) closeModals(); }));
+
+  $('teamCount').addEventListener('click', e => {
+    const b = e.target.closest('button[data-n]'); if(!b) return;
+    state.teamCount = +b.dataset.n; save(); renderHome();
+  });
+  $('teamNames').addEventListener('input', e => {
+    const inp = e.target.closest('input[data-k]'); if(!inp) return;
+    state.teams[+inp.dataset.k].name = inp.value; save();
+  });
+  $('startBtn').addEventListener('click', () => showScreen(state.unlocked ? 'final' : 'play'));
+
+  $('card').addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if(!b || b.disabled) return;
+    const i = state.current, act = b.dataset.act;
+    if(act === 'hint'){ state.hint[i] = true; save(); renderCard(false); const h = $('hintBox'); if(h) h.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+    if(act === 'answer'){ state.ans[i] = true; save(); timerStop(); renderCard(false); const a = $('ansBox'); if(a) a.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+    if(act === 'light') lightCandle(i);
+    if(act === 'prev') goTo(i-1);
+    if(act === 'next') goTo(i+1);
+    if(act === 'vault') showScreen('final');
+  });
+  $('dots').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if(b) goTo(+b.dataset.go); });
+  $('tStart').addEventListener('click', () => T.running ? timerStop() : timerStart());
+  $('tAdd').addEventListener('click', () => { T.remaining += 30; T.total = Math.max(T.total, T.remaining); T.up = false; renderTimer(); });
+  $('tReset').addEventListener('click', () => timerSet(CH[state.current].time));
+  $('scores').addEventListener('click', e => { const b = e.target.closest('button[data-d]'); if(b) addScore(+b.dataset.k, +b.dataset.d); });
+  $('unlockBtn').addEventListener('click', unlock);
+
+  document.addEventListener('keydown', e => {
+    const openM = document.querySelector('.modal:not([hidden])');
+    if(e.key === 'Escape' && openM){ closeModals(); return; }
+    if(openM) return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    if(tag === 'input' || tag === 'textarea') return;
+    if(state.screen !== 'play') return;
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); if(state.current < 7) goTo(state.current+1); else if(allLit()) showScreen('final'); }
+    if(e.key === 'ArrowRight'){ e.preventDefault(); goTo(state.current-1); }
+    if(e.key === ' ' && tag !== 'button'){ e.preventDefault(); T.running ? timerStop() : timerStart(); }
+  });
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawStars(); fitCard(); }, 150); });
+}
+
+function fillAnswers(){
+  $('answerList').innerHTML = CH.map((c,i) => `<li><b>${c.title}:</b> ${c.short}</li>`).join('') + `<li style="list-style:none;margin-top:.4em"><b>מילת הקוד:</b> סופגניות</li>`;
+}
+
+/* ---------- boot ---------- */
+function start(data){
+  if(data && data.screen) state = normalize(data);
+  else { const s = loadLocal(); if(s) state = normalize(s); }
+  buildMenorah();
+  bind();
+  initTheme();
+  fillAnswers();
+  drawStars();
+  showScreen(state.screen);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitCard());
+  try{ window.claude?.hot?.snapshot?.(() => JSON.parse(JSON.stringify(state))); }catch(e){}
+}
+if(window.claude?.hot?.ready) window.claude.hot.ready(start);
+else start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>
