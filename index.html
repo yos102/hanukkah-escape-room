@@ -476,7 +476,7 @@ const CH = [
     explain:'השמש הוא הנר שבעזרתו מדליקים את כל שאר הנרות. הוא עומד גבוה או בצד, כדי שיהיה ברור שהוא לא אחד מנרות החג.'
   },
   {
-    type:'פיצוח צופן', title:'ההודעה הסודית', time:240, letter:'נ', slot:4,
+    type:'פיצוח צופן', title:'ההודעה הסודית', time:300, letter:'נ', slot:4,
     body:`<p>בבית המקדש נמצא פתק מוצפן בצופן <b>אתב"ש</b>: האות הראשונה מתחלפת באחרונה, השנייה בלפני-אחרונה, וכך הלאה. פענחו את שם הגיבור!</p>
       <div class="cipher" aria-label="ההודעה המוצפנת"><div>${tiles('מצפקצ')}</div><div>${tiles('צילשמ')}</div></div>
       <div class="keytable" aria-label="מפתח הצופן">${ATBASH.map(p => `<span class="pair"><span>${p[0]}</span><i>⇄</i><span>${p[1]}</span></span>`).join('')}</div>
@@ -870,6 +870,7 @@ function resetGame(){
 }
 
 /* ---------- timer ---------- */
+const HINT_BONUS = 90; /* שניות שמתווספות לטיימר בלחיצה על רמז */
 const T = {total:0, remaining:0, running:false, id:null, last:0, up:false};
 function timerSet(sec){ timerStop(); T.total = sec; T.remaining = sec; T.up = false; renderTimer(); }
 function timerStart(){
@@ -1010,7 +1011,7 @@ function bind(){
   $('card').addEventListener('click', e => {
     const b = e.target.closest('[data-act]'); if(!b || b.disabled) return;
     const i = state.current, act = b.dataset.act;
-    if(act === 'hint'){ state.hint[i] = true; save(); renderCard(false); const h = $('hintBox'); if(h) h.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+    if(act === 'hint'){ state.hint[i] = true; save(); renderCard(false); T.remaining += HINT_BONUS; T.total = Math.max(T.total, T.remaining); T.up = false; renderTimer(); const h = $('hintBox'); if(h) h.scrollIntoView({block:'nearest', behavior:'smooth'}); }
     if(act === 'answer'){ state.ans[i] = true; save(); timerStop(); renderCard(false); const a = $('ansBox'); if(a) a.scrollIntoView({block:'nearest', behavior:'smooth'}); }
     if(act === 'light') lightCandle(i);
     if(act === 'prev') goTo(i-1);
